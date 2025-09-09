@@ -24,9 +24,9 @@ const DevelopmentBudget: React.FC<DevelopmentBudgetProps> = ({ results }) => {
       {/* Cost Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Land Acquisition */}
-        <div className="bg-gray-50 rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Land Acquisition</h3>
-          <div className="space-y-2">
+        <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
+          <h3 className="text-lg font-semibold mb-4 text-slate-900">Land Acquisition</h3>
+          <div className="space-y-2 text-slate-700">
             <div className="flex justify-between">
               <span>Purchase Price</span>
               <span>{formatCurrency(originalBudget.landAcquisition.purchasePrice)}</span>
@@ -55,9 +55,9 @@ const DevelopmentBudget: React.FC<DevelopmentBudgetProps> = ({ results }) => {
         </div>
 
         {/* Soft Costs */}
-        <div className="bg-gray-50 rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Soft Costs</h3>
-          <div className="space-y-2">
+        <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
+          <h3 className="text-lg font-semibold mb-4 text-slate-900">Soft Costs</h3>
+          <div className="space-y-2 text-slate-700">
             <div className="flex justify-between">
               <span>Architectural Fees</span>
               <span>{formatCurrency(originalBudget.softCosts.architecturalFees)}</span>
@@ -82,8 +82,8 @@ const DevelopmentBudget: React.FC<DevelopmentBudgetProps> = ({ results }) => {
               <span>Bond Premium</span>
               <span>{formatCurrency(originalBudget.softCosts.bondPremium)}</span>
             </div>
-            <div className="flex justify-between text-red-600">
-              <span>Contingency (3.5% - TOO LOW)</span>
+            <div className="flex justify-between text-red-700 font-medium">
+              <span>Contingency (3.5% - Below Standard)</span>
               <span>{formatCurrency(originalBudget.softCosts.contingency)}</span>
             </div>
             <div className="flex justify-between font-semibold border-t pt-2">
@@ -170,24 +170,24 @@ const DevelopmentBudget: React.FC<DevelopmentBudgetProps> = ({ results }) => {
       </div>
 
       {/* Cost Per Unit Analysis */}
-      <div className="bg-gray-50 rounded-lg p-6">
-        <h3 className="text-lg font-semibold mb-4">Cost Per Unit Analysis</h3>
+      <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
+        <h3 className="text-lg font-semibold mb-4 text-slate-900">Cost Per Unit Analysis</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">{formatCurrency(results.costPerUnit)}</div>
-            <div className="text-sm text-gray-500">Total Cost/Unit</div>
+            <div className="text-2xl font-bold text-slate-900">{formatCurrency(results.costPerUnit)}</div>
+            <div className="text-sm text-slate-600">Total Cost/Unit</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">{formatCurrency(preFabEstimate.projectTotal / 32)}</div>
-            <div className="text-sm text-gray-500">Hard Cost/Unit</div>
+            <div className="text-2xl font-bold text-slate-900">{formatCurrency(preFabEstimate.projectTotal / 32)}</div>
+            <div className="text-sm text-slate-600">Hard Cost/Unit</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">{formatCurrency(originalBudget.softCosts.total / 32)}</div>
-            <div className="text-sm text-gray-500">Soft Cost/Unit</div>
+            <div className="text-2xl font-bold text-slate-900">{formatCurrency(originalBudget.softCosts.total / 32)}</div>
+            <div className="text-sm text-slate-600">Soft Cost/Unit</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">32</div>
-            <div className="text-sm text-gray-500">Total Units</div>
+            <div className="text-2xl font-bold text-slate-900">32</div>
+            <div className="text-sm text-slate-600">Total Units</div>
           </div>
         </div>
       </div>
