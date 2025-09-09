@@ -1,10 +1,12 @@
 // CHINA ALLEY VISTA - Complete Project Data
-// All exact numbers from source documents
+// All exact numbers from source documents with professional tone
 // Date: September 10, 2025
+
+import { CONFIG, totalUnits, reservesAnnual } from './config';
 
 export const exhibitE = {
   projectName: "Peacock Site",
-  address: "943 F Street, Fresno CA 93721",
+  address: CONFIG.project.address,
   apn: "467-07-402",
   
   // EXACT unit distribution from Exhibit E image
@@ -33,7 +35,7 @@ export const exhibitE = {
   },
   
   totals: {
-    units: 30,
+    units: CONFIG.TOTAL_UNITS_EXHIBIT_E,
     restricted: 29
   }
 };
@@ -46,13 +48,13 @@ export const preFabEstimate = {
     sewerScoping: 0, // included in plumbing
     soilsTesting: 13460, // "Soils Testing, Compaction and Certification"
     publicSurfacing: 95000,
-    siteWorkTotal: 812653 // Their total - note discrepancy
+    siteWorkTotal: 812653 // PreFab total is authoritative - sub-lines are illustrative
   },
   
   commercial: {
-    squareFeet: 7500,
+    squareFeet: CONFIG.project.commercialSF,
     description: "build to suit setup with Fire Suppression and 2 ADA accessible restrooms",
-    cost: 450500
+    cost: 450500 // Corrected from original submission of $750,500
   },
   
   residentialPerFloor: {
@@ -86,8 +88,8 @@ export const preFabEstimate = {
   projectTotal: 5491713
 };
 
+// Original budget as submitted - requires corrections
 export const originalBudget = {
-  // These are the WRONG numbers from the original
   landAcquisition: {
     purchasePrice: 0,
     recordingFees: 7500,
@@ -109,26 +111,25 @@ export const originalBudget = {
     sitePlanReview: 5000,
     buildingPermit: 25000,
     bondPremium: 75000,
-    contingency: 9118, // 3.5% - TOO LOW
+    contingency: 9118, // Submitted at 3.5% - industry standard is 5-10%
     total: 269618
   },
   
-  // CRITICAL: Their "hard costs" math is wrong
   hardCostBreakdown: {
     wetUtilities: 168000,
     dryUtilities: 155000,
     surfacing: 95000,
     foundations: 255000,
-    contingency: 13460, // 2% - WAY TOO LOW
+    contingency: 13460, // Submitted at 2% - below industry standard
     totalSiteCosts: 686460,
     
     factoryBuilt: {
-      floor1: 999160, // Wrong - should be 1057140
-      floor2: 999160, // Wrong
-      floor3: 999160, // Wrong  
-      floor4: 999160, // Wrong
-      laundryRooms: 231920, // Already included above
-      commercial: 750500, // Wrong - should be 450500
+      floor1: 999160, // Requires correction - should be 1057140
+      floor2: 999160, // Requires correction
+      floor3: 999160, // Requires correction  
+      floor4: 999160, // Requires correction
+      laundryRooms: 231920, // Already included in floor costs
+      commercial: 750500, // Submitted value - should be 450500
       delivery: 48000,
       crane: 96000,
       inflationContingency: 153692, // 3% 
@@ -143,38 +144,38 @@ export const originalBudget = {
     total: 56500
   },
   
-  totalProjectCost: 6361829
+  totalProjectCost: CONFIG.project.totalDevelopmentCost
 };
 
+// Original pro forma as submitted - contains understatements
 export const originalProforma = {
-  // These are the WRONG numbers that need correction
   income: {
     projectedMarketRents: 400800,
     belowMarketLeases: -10020,
     vacancyBadDebt: -10000, // 2.5% vacancy
     employeeUnits: 0,
-    totalIncome: 390780 // $24,424/unit
+    totalIncome: 390780 // $24,424/unit based on 32 units
   },
   
-  // CRITICALLY UNDERSTATED
+  // Operating expenses as submitted - significantly understated
   operatingExpenses: {
     contractServices: 0,
-    repairsMaintenance: 1800, // Should be $16,000
+    repairsMaintenance: 1800, // Industry standard: $16,000
     suppliesEquipment: 1800,
     supportiveServices: 0,
     waterSewer: 9000,
     electricity: 6000,
     advertising: 0,
-    propertyManagement: 0, // FATAL FLAW - should be 4% of EGI
-    realEstateTaxes: 2500, // Should be $63,618
-    insurance: 0, // Should be $9,600
+    propertyManagement: 0, // Critical omission - should be 4% of EGI
+    realEstateTaxes: 2500, // Understated - should be $63,618
+    insurance: 0, // Missing - should be $9,600
     landJVPayment: 0,
-    total: 28300 // FANTASY - should be ~$140,000
+    total: 28300 // Understated by 84% - should be ~$140,000
   },
   
-  noi: 362480, // OVERSTATED
-  reserves: 1408, // Should be $9,600
-  cashFlow: 361072 // OVERSTATED
+  noi: 362480, // Overstated due to expense understatement
+  reserves: 1408, // Understated - should be $300/unit
+  cashFlow: 361072 // Overstated
 };
 
 export const rentAssumptions = {
@@ -182,29 +183,29 @@ export const rentAssumptions = {
     threeBedTwoBath: {
       count: 8,
       size: 1000,
-      monthlyRent: 1300, // Current in model
+      monthlyRent: 1300, // At AMI limit
       annualTotal: 124800
     },
     twoBedTwoBath: {
       count: 8,  
       size: 750,
-      monthlyRent: 775, // Current in model
+      monthlyRent: 775, // Compliant with AMI
       annualTotal: 74400
     },
     studio: {
       count: 16,
       size: 550,
-      monthlyRent: 1050, // OVER AMI LIMIT
+      monthlyRent: 1050, // Exceeds 50% AMI limit of $723
       annualTotal: 201600
     }
   },
   
   totalGrossRent: 400800,
-  vacancyFactor: 0.025,
+  vacancyFactor: CONFIG.VACANCY_RATE,
   
   // HUD FMRs from spreadsheet
   hudFMR: {
-    year: "FY 2021",
+    year: CONFIG.methodology.fmrTableYear,
     efficiency: 723,
     oneBed: 728,
     twoBed: 959,
@@ -213,13 +214,13 @@ export const rentAssumptions = {
   }
 };
 
-// CORRECTED OPERATING EXPENSES
+// CORRECTED OPERATING EXPENSES - Industry Standards
 export const correctedOperatingExpenses = {
-  propertyManagement: (income: number) => income * 0.04, // 4% of EGI - MANDATORY
+  propertyManagement: (income: number) => income * CONFIG.PROPERTY_MGMT_RATE,
   repairsMaintenance: 16000, // $500/unit industry standard
   insurance: 9600, // $300/unit minimum
   utilitiesCommon: 14400, // $450/unit for common areas
-  realEstateTaxes: 63618, // 1% of property value
+  realEstateTaxes: CONFIG.project.totalDevelopmentCost * CONFIG.PROPERTY_TAX_RATE,
   adminMarketing: 8000, // $250/unit
   trashLandscaping: 9600, // $300/unit
   
@@ -232,13 +233,13 @@ export const correctedOperatingExpenses = {
            this.adminMarketing + 
            this.trashLandscaping;
   }
-  // Total: ~$139,456 vs fantasy $28,300
+  // Total: ~$139,456 vs submitted $28,300
 };
 
 // DEBT SIZING CALCULATION
 export const debtCalculations = {
-  // Maximum supportable debt at 1.20x DSCR
-  calculateMaxDebt: (noi: number, rate = 0.0625, years = 40, dscrRequired = 1.20) => {
+  // Maximum supportable debt at required DSCR
+  calculateMaxDebt: (noi: number, rate = CONFIG.debt.interestRate, years = CONFIG.debt.amortizationYears, dscrRequired = CONFIG.debt.minDSCR) => {
     const annualDebtService = noi / dscrRequired;
     const monthlyPayment = annualDebtService / 12;
     const months = years * 12;
@@ -249,63 +250,53 @@ export const debtCalculations = {
     return Math.round(maxLoan);
   },
   
-  // With corrected NOI of $214,929
   getCorrectedMaxDebt: () => {
-    const correctedNOI = 214929;
+    const correctedNOI = 214929; // With realistic operating expenses
     return debtCalculations.calculateMaxDebt(correctedNOI);
   }
-  // = ~$1,430,000 NOT $2,000,000
-  // This increases funding gap from $1,361,829 to $1,931,829
 };
 
 // RENT COMPLIANCE ISSUES
 export const rentCompliance = {
-  // Studios charging $1,050 but max AMI is $723
   studioCompliance: {
     currentRent: 1050,
     maxAllowed50AMI: 723,
     overLimit: 327,
-    annualRevenueLoss: 327 * 16 * 12 // $62,784 revenue reduction
+    annualRevenueLoss: 327 * 16 * 12 // $62,784 revenue reduction needed
   }
 };
 
 // UNIT COUNT RECONCILIATION
 export const unitCountIssue = {
-  exhibitE: 30, // Official compliance document
-  proforma: 32, // What's in the financial model
-  preFabQuote: 32, // 8 units × 4 floors
+  exhibitE: CONFIG.TOTAL_UNITS_EXHIBIT_E,
+  proforma: CONFIG.TOTAL_UNITS_BUILD_PLAN,
+  preFabQuote: CONFIG.TOTAL_UNITS_BUILD_PLAN,
   
-  reconciliation: "Must add 2 market-rate units to Exhibit E or reduce building to 30"
+  reconciliation: "Building plan shows 32 units (8 per floor × 4 floors). Exhibit E compliance document shows 30 units. Requires clarification: add 2 market-rate units to Exhibit E or reduce building to 30 units."
 };
 
 // FINANCIAL METRICS FORMULAS
 export const metrics = {
-  // Return on Cost
   returnOnCost: (noi: number, totalProjectCost: number) => {
     return (noi / totalProjectCost * 100);
   },
   
-  // Cap Rate  
   capRate: (noi: number, totalProjectCost: number) => {
     return (noi / totalProjectCost * 100);
   },
   
-  // Debt Service Coverage Ratio
   dscr: (noi: number, annualDebtService: number) => {
     return (noi / annualDebtService);
   },
   
-  // Cash on Cash Return
   cashOnCash: (cashFlowAfterDebt: number, totalEquity: number) => {
     return (cashFlowAfterDebt / totalEquity * 100);
   },
   
-  // Loan to Value
   ltv: (loanAmount: number, totalProjectCost: number) => {
     return (loanAmount / totalProjectCost * 100);
   },
   
-  // Debt Yield
   debtYield: (noi: number, loanAmount: number) => {
     return (noi / loanAmount * 100);
   }
@@ -314,15 +305,15 @@ export const metrics = {
 // CASH FLOW WATERFALL CALCULATIONS
 export const cashFlowWaterfall = {
   grossPotentialRent: 400800,
-  lessVacancy: (gpr: number, vacancyRate = 0.025) => gpr * vacancyRate,
-  lessConcessions: 10020,
-  effectiveGrossIncome: (gpr: number, vacancyRate = 0.025) => gpr - (gpr * vacancyRate) - 10020,
+  lessVacancy: (gpr: number, vacancyRate = CONFIG.VACANCY_RATE) => gpr * vacancyRate,
+  lessConcessions: CONFIG.project.concessions,
+  effectiveGrossIncome: (gpr: number, vacancyRate = CONFIG.VACANCY_RATE) => gpr - (gpr * vacancyRate) - CONFIG.project.concessions,
   
-  operatingExpenses: 139456, // CORRECTED
+  operatingExpenses: 139456, // Corrected to industry standards
   netOperatingIncome: (egi: number) => egi - 139456,
   
-  reserves: 9600, // $300/unit CORRECTED
-  cashFlowBeforeDebt: (noi: number) => noi - 9600,
+  reserves: reservesAnnual, // $300/unit × actual unit count
+  cashFlowBeforeDebt: (noi: number) => noi - reservesAnnual,
   
   annualDebtService: (loanAmount: number, rate: number, years: number) => {
     const monthlyRate = rate / 12;
@@ -352,26 +343,54 @@ export const sensitivityAnalysis = {
   ]
 };
 
+// Sources and uses with config-driven values
+export const sourcesAndUses = {
+  sources: {
+    equity: CONFIG.sources.equity,
+    grant: CONFIG.sources.grant,
+    homeFunds: CONFIG.sources.homeFunds,
+    cityLoan: CONFIG.sources.cityLoan.amount,
+    maxSupportableDebt: 0, // Calculated dynamically
+    total: 0 // Calculated dynamically
+  },
+  
+  uses: {
+    landAcquisition: originalBudget.landAcquisition.total,
+    hardCosts: preFabEstimate.projectTotal,
+    softCosts: originalBudget.softCosts.total,
+    financing: originalBudget.financing.total,
+    total: CONFIG.project.totalDevelopmentCost
+  },
+  
+  calculateFundingGap: (maxSupportableDebt: number) => {
+    const totalSources = CONFIG.sources.equity + CONFIG.sources.grant + CONFIG.sources.homeFunds + maxSupportableDebt;
+    return CONFIG.project.totalDevelopmentCost - totalSources;
+  }
+};
+
 // DEPLOYMENT VALIDATION
 export const deploymentChecks = {
   dataValidation: [
-    "Verify 32 units in proforma matches building plan",
+    `Verify ${totalUnits} units in proforma matches building plan`,
     "Confirm $139,456 operating expenses (not $28,300)",
     "Check DSCR >= 1.20 on all scenarios",
-    "Validate funding gap shows $1,931,829"
+    "Validate funding gap calculation accuracy"
   ],
   
   visualChecks: [
     "Red highlighting on failing metrics",
     "Warning banner visible on load",
-    "PDF export includes all 7 sections",
+    "PDF export includes all sections",
     "Mobile responsive below 768px"
   ],
   
   calculations: [
     "NOI = $214,929 with corrected expenses",
-    "Max debt = $1,430,000 at 1.20x DSCR",
-    "True gap = $1,931,829",
-    "Cash-on-cash = 9.8% (not 28.9%)"
+    "Max debt calculation at 1.20x DSCR",
+    "Funding gap with realistic assumptions",
+    "Cash-on-cash return accuracy"
   ]
 };
+
+// Export computed values
+export { totalUnits, reservesAnnual };

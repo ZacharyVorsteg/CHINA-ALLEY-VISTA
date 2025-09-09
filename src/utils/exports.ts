@@ -8,8 +8,9 @@ import {
   type FinancialResults 
 } from './calculations';
 import { originalBudget, preFabEstimate, correctedOperatingExpenses } from '@/data/projectData';
+import { CONFIG, totalUnits } from '@/data/config';
 
-// PDF Export
+// PDF Export with improved professional tone
 export const exportToPDF = async (results: FinancialResults) => {
   const pdf = new jsPDF('p', 'mm', 'a4');
   const pageWidth = pdf.internal.pageSize.getWidth();
@@ -60,9 +61,9 @@ export const exportToPDF = async (results: FinancialResults) => {
   
   pdf.setFontSize(12);
   pdf.setFont('helvetica', 'normal');
-  yPosition = addText('Project: 30-unit mixed-use affordable housing development', margin, yPosition + 5, { lineHeight: 6 });
-  yPosition = addText('Location: 935 China Alley / 943 F Street, Fresno, CA', margin, yPosition, { lineHeight: 6 });
-  yPosition = addText('Total Development Cost: ' + formatCurrency(originalBudget.totalProjectCost), margin, yPosition, { lineHeight: 6 });
+  yPosition = addText(`Project: ${totalUnits}-unit mixed-use affordable housing development`, margin, yPosition + 5, { lineHeight: 6 });
+  yPosition = addText(`Location: ${CONFIG.project.address}`, margin, yPosition, { lineHeight: 6 });
+  yPosition = addText('Total Development Cost: ' + formatCurrency(CONFIG.project.totalDevelopmentCost), margin, yPosition, { lineHeight: 6 });
   
   // Key Metrics
   pdf.setFont('helvetica', 'bold');
@@ -79,18 +80,18 @@ export const exportToPDF = async (results: FinancialResults) => {
   yPosition = addText('RECOMMENDATION:', margin, yPosition + 10, { lineHeight: 8 });
   pdf.setFont('helvetica', 'normal');
   const recommendation = results.fundingGap > 2000000 || results.dscr < 1.20 ? 
-    'PROCEED WITH CONDITIONS - Significant funding gap and compliance issues identified' :
+    'PROCEED WITH CONDITIONS - Additional funding sources and expense corrections required' :
     'FEASIBLE WITH LIHTC - Project viable with tax credit equity';
   yPosition = addText(recommendation, margin, yPosition, { lineHeight: 6 });
 
   // Critical Issues
   pdf.setFont('helvetica', 'bold');
-  yPosition = addText('CRITICAL ISSUES IDENTIFIED:', margin, yPosition + 10, { lineHeight: 8 });
+  yPosition = addText('ISSUES REQUIRING ATTENTION:', margin, yPosition + 10, { lineHeight: 8 });
   pdf.setFont('helvetica', 'normal');
-  yPosition = addText('• Operating expenses understated by 84% ($28,300 vs $139,456)', margin + 5, yPosition, { lineHeight: 6 });
-  yPosition = addText('• Zero property management fee will fail underwriting', margin + 5, yPosition, { lineHeight: 6 });
-  yPosition = addText('• Studio rents exceed AMI caps by 45%', margin + 5, yPosition, { lineHeight: 6 });
-  yPosition = addText('• Unit count mismatch: 30 vs 32 units', margin + 5, yPosition, { lineHeight: 6 });
+  yPosition = addText('• Operating expenses require correction to industry standards', margin + 5, yPosition, { lineHeight: 6 });
+  yPosition = addText('• Property management fee must be included for lender approval', margin + 5, yPosition, { lineHeight: 6 });
+  yPosition = addText('• Studio rents exceed AMI compliance limits', margin + 5, yPosition, { lineHeight: 6 });
+  yPosition = addText('• Unit count reconciliation needed between plans', margin + 5, yPosition, { lineHeight: 6 });
 
   // Development Budget Page
   pdf.addPage();
@@ -103,8 +104,12 @@ export const exportToPDF = async (results: FinancialResults) => {
   pdf.setFont('helvetica', 'bold');
   yPosition = addText('SOURCES OF FUNDS:', margin, yPosition + 5, { lineHeight: 8 });
   pdf.setFont('helvetica', 'normal');
-  yPosition = addText('Grant Funding: ' + formatCurrency(1250000), margin + 5, yPosition, { lineHeight: 6 });
-  yPosition = addText('City Soft Loan (5.5%, 3 years): ' + formatCurrency(1750000), margin + 5, yPosition, { lineHeight: 6 });
+  yPosition = addText('Grant Funding: ' + formatCurrency(CONFIG.sources.grant), margin + 5, yPosition, { lineHeight: 6 });
+  yPosition = addText('HOME Funds: ' + formatCurrency(CONFIG.sources.homeFunds), margin + 5, yPosition, { lineHeight: 6 });
+  yPosition = addText('Sponsor Equity: ' + formatCurrency(CONFIG.sources.equity), margin + 5, yPosition, { lineHeight: 6 });
+  if (CONFIG.sources.cityLoan.amount > 0) {
+    yPosition = addText(`City Soft Loan (${(CONFIG.sources.cityLoan.rate * 100).toFixed(1)}%, ${CONFIG.sources.cityLoan.termYears} years): ` + formatCurrency(CONFIG.sources.cityLoan.amount), margin + 5, yPosition, { lineHeight: 6 });
+  }
   yPosition = addText('Max Supportable Debt: ' + formatCurrency(results.maxSupportableDebt), margin + 5, yPosition, { lineHeight: 6 });
   yPosition = addText('FUNDING GAP: ' + formatCurrency(results.fundingGap), margin + 5, yPosition, { lineHeight: 6 });
 
@@ -128,12 +133,12 @@ export const exportToPDF = async (results: FinancialResults) => {
   yPosition = addText('INCOME:', margin, yPosition + 5, { lineHeight: 8 });
   pdf.setFont('helvetica', 'normal');
   yPosition = addText('Gross Potential Rent: ' + formatCurrency(results.grossPotentialRent), margin + 5, yPosition, { lineHeight: 6 });
-  yPosition = addText('Less: Vacancy (2.5%): (' + formatCurrency(results.vacancy) + ')', margin + 5, yPosition, { lineHeight: 6 });
-  yPosition = addText('Less: Concessions: (' + formatCurrency(10020) + ')', margin + 5, yPosition, { lineHeight: 6 });
+  yPosition = addText(`Less: Vacancy (${formatPercentage(CONFIG.VACANCY_RATE * 100)}): (` + formatCurrency(results.vacancy) + ')', margin + 5, yPosition, { lineHeight: 6 });
+  yPosition = addText('Less: Concessions: (' + formatCurrency(CONFIG.project.concessions) + ')', margin + 5, yPosition, { lineHeight: 6 });
   yPosition = addText('Effective Gross Income: ' + formatCurrency(results.effectiveGrossIncome), margin + 5, yPosition, { lineHeight: 6 });
 
   pdf.setFont('helvetica', 'bold');
-  yPosition = addText('OPERATING EXPENSES (CORRECTED):', margin, yPosition + 10, { lineHeight: 8 });
+  yPosition = addText('OPERATING EXPENSES (INDUSTRY STANDARDS):', margin, yPosition + 10, { lineHeight: 8 });
   pdf.setFont('helvetica', 'normal');
   yPosition = addText('Property Management (4% EGI): ' + formatCurrency(correctedOperatingExpenses.propertyManagement(results.effectiveGrossIncome)), margin + 5, yPosition, { lineHeight: 6 });
   yPosition = addText('Repairs & Maintenance: ' + formatCurrency(correctedOperatingExpenses.repairsMaintenance), margin + 5, yPosition, { lineHeight: 6 });
@@ -146,11 +151,30 @@ export const exportToPDF = async (results: FinancialResults) => {
   pdf.setFont('helvetica', 'bold');
   yPosition = addText('NET OPERATING INCOME: ' + formatCurrency(results.netOperatingIncome), margin, yPosition + 10, { lineHeight: 8 });
 
+  // Methodology & Sources Page
+  pdf.addPage();
+  yPosition = margin;
+  pdf.setFontSize(16);
+  pdf.setFont('helvetica', 'bold');
+  yPosition = addText('METHODOLOGY & SOURCES', margin, yPosition, { lineHeight: 10 });
+  
+  pdf.setFontSize(12);
+  pdf.setFont('helvetica', 'bold');
+  yPosition = addText('KEY ASSUMPTIONS:', margin, yPosition + 5, { lineHeight: 8 });
+  pdf.setFont('helvetica', 'normal');
+  yPosition = addText(`• Property Tax: ${CONFIG.methodology.propertyTaxBasis}`, margin + 5, yPosition, { lineHeight: 6 });
+  yPosition = addText(`• Management Fee: ${CONFIG.methodology.managementFeeBasis}`, margin + 5, yPosition, { lineHeight: 6 });
+  yPosition = addText(`• Reserves: ${CONFIG.methodology.reservesBasis}`, margin + 5, yPosition, { lineHeight: 6 });
+  yPosition = addText(`• Vacancy: ${CONFIG.methodology.vacancyBasis}`, margin + 5, yPosition, { lineHeight: 6 });
+  yPosition = addText(`• AMI Limits: ${CONFIG.methodology.amiTableYear}`, margin + 5, yPosition, { lineHeight: 6 });
+  yPosition = addText(`• Fair Market Rents: ${CONFIG.methodology.fmrTableYear}`, margin + 5, yPosition, { lineHeight: 6 });
+  yPosition = addText(`• Operating Benchmarks: ${CONFIG.methodology.opexBenchmarks}`, margin + 5, yPosition, { lineHeight: 6 });
+
   // Save PDF
   pdf.save('China_Alley_Vista_Financial_Analysis.pdf');
 };
 
-// Excel Export
+// Excel Export with corrected formulas
 export const exportToExcel = (results: FinancialResults) => {
   const wb = XLSX.utils.book_new();
 
@@ -161,7 +185,9 @@ export const exportToExcel = (results: FinancialResults) => {
     ['Date: September 10, 2025'],
     [''],
     ['KEY METRICS', ''],
-    ['Total Development Cost', originalBudget.totalProjectCost],
+    ['Total Development Cost', CONFIG.project.totalDevelopmentCost],
+    ['Total Units', totalUnits],
+    ['Cost Per Unit', results.costPerUnit],
     ['Net Operating Income', results.netOperatingIncome],
     ['Debt Service Coverage Ratio', results.dscr],
     ['Cap Rate', results.capRate / 100],
@@ -199,19 +225,21 @@ export const exportToExcel = (results: FinancialResults) => {
     ['Other Soft Costs', originalBudget.softCosts.total - originalBudget.softCosts.architecturalFees - originalBudget.softCosts.civilEngineering - originalBudget.softCosts.buildingPermit - originalBudget.softCosts.legalConstruction - originalBudget.softCosts.generalLiability],
     ['Soft Costs Total', originalBudget.softCosts.total],
     [''],
-    ['TOTAL PROJECT COST', originalBudget.totalProjectCost]
+    ['TOTAL PROJECT COST', CONFIG.project.totalDevelopmentCost]
   ];
   const budgetWS = XLSX.utils.aoa_to_sheet(budgetData);
   XLSX.utils.book_append_sheet(wb, budgetWS, 'Development Budget');
 
-  // Operating Pro Forma Sheet
+  // Operating Pro Forma Sheet with corrected formulas
   const proformaData = [
     ['OPERATING PRO FORMA'],
     [''],
     ['INCOME', ''],
     ['Gross Potential Rent', results.grossPotentialRent],
-    ['Less: Vacancy (2.5%)', -results.vacancy],
-    ['Less: Concessions', -10020],
+    ['Vacancy Rate', CONFIG.VACANCY_RATE],
+    ['Concessions', CONFIG.project.concessions],
+    ['Less: Vacancy', -results.vacancy],
+    ['Less: Concessions', -CONFIG.project.concessions],
     ['Effective Gross Income', results.effectiveGrossIncome],
     [''],
     ['OPERATING EXPENSES', ''],
@@ -232,10 +260,10 @@ export const exportToExcel = (results: FinancialResults) => {
   ];
   const proformaWS = XLSX.utils.aoa_to_sheet(proformaData);
   
-  // Add formulas to pro forma
-  proformaWS['B8'] = { f: 'B4+B5+B6' }; // EGI formula
-  proformaWS['B19'] = { f: 'B8+SUM(B10:B17)' }; // NOI formula
-  proformaWS['B22'] = { f: 'B19+B20+B21' }; // Cash flow after debt
+  // Add corrected formulas
+  proformaWS['B9'] = { f: 'B4*(1-B5)-B6' }; // EGI = GPR * (1-vacancy) - concessions
+  proformaWS['B21'] = { f: 'B9+SUM(B12:B19)' }; // NOI = EGI - Operating Expenses (sum is negative)
+  proformaWS['B25'] = { f: 'B21-B22-B24' }; // Cash flow after debt = NOI - Reserves - Debt Service
   
   XLSX.utils.book_append_sheet(wb, proformaWS, 'Operating Pro Forma');
 
@@ -244,21 +272,30 @@ export const exportToExcel = (results: FinancialResults) => {
     ['SOURCES & USES OF FUNDS'],
     [''],
     ['SOURCES', 'Amount', '%'],
-    ['Grant Funding', 1250000, 1250000 / originalBudget.totalProjectCost],
-    ['City Soft Loan', 1750000, 1750000 / originalBudget.totalProjectCost],
-    ['Max Supportable Debt', results.maxSupportableDebt, results.maxSupportableDebt / originalBudget.totalProjectCost],
-    ['Total Sources', 1250000 + 1750000 + results.maxSupportableDebt, (1250000 + 1750000 + results.maxSupportableDebt) / originalBudget.totalProjectCost],
+    ['Grant Funding', CONFIG.sources.grant, CONFIG.sources.grant / CONFIG.project.totalDevelopmentCost],
+    ['HOME Funds', CONFIG.sources.homeFunds, CONFIG.sources.homeFunds / CONFIG.project.totalDevelopmentCost],
+    ['Sponsor Equity', CONFIG.sources.equity, CONFIG.sources.equity / CONFIG.project.totalDevelopmentCost],
+    ['Max Supportable Debt', results.maxSupportableDebt, results.maxSupportableDebt / CONFIG.project.totalDevelopmentCost],
+    ['Total Sources', CONFIG.sources.grant + CONFIG.sources.homeFunds + CONFIG.sources.equity + results.maxSupportableDebt, (CONFIG.sources.grant + CONFIG.sources.homeFunds + CONFIG.sources.equity + results.maxSupportableDebt) / CONFIG.project.totalDevelopmentCost],
     [''],
     ['USES', 'Amount', '%'],
-    ['Land Acquisition', originalBudget.landAcquisition.total, originalBudget.landAcquisition.total / originalBudget.totalProjectCost],
-    ['Hard Costs', preFabEstimate.projectTotal, preFabEstimate.projectTotal / originalBudget.totalProjectCost],
-    ['Soft Costs', originalBudget.softCosts.total, originalBudget.softCosts.total / originalBudget.totalProjectCost],
-    ['Financing Costs', originalBudget.financing.total, originalBudget.financing.total / originalBudget.totalProjectCost],
-    ['Total Uses', originalBudget.totalProjectCost, 1],
+    ['Land Acquisition', originalBudget.landAcquisition.total, originalBudget.landAcquisition.total / CONFIG.project.totalDevelopmentCost],
+    ['Hard Costs', preFabEstimate.projectTotal, preFabEstimate.projectTotal / CONFIG.project.totalDevelopmentCost],
+    ['Soft Costs', originalBudget.softCosts.total, originalBudget.softCosts.total / CONFIG.project.totalDevelopmentCost],
+    ['Financing Costs', originalBudget.financing.total, originalBudget.financing.total / CONFIG.project.totalDevelopmentCost],
+    ['Total Uses', CONFIG.project.totalDevelopmentCost, 1],
     [''],
-    ['FUNDING GAP', results.fundingGap, results.fundingGap / originalBudget.totalProjectCost]
+    ['FUNDING GAP', results.fundingGap, results.fundingGap / CONFIG.project.totalDevelopmentCost]
   ];
   const sourcesUsesWS = XLSX.utils.aoa_to_sheet(sourcesUsesData);
+  
+  // Format percentage columns
+  for (let i = 4; i <= 17; i++) {
+    if (sourcesUsesWS[`C${i}`]) {
+      sourcesUsesWS[`C${i}`].z = '0.0%';
+    }
+  }
+  
   XLSX.utils.book_append_sheet(wb, sourcesUsesWS, 'Sources & Uses');
 
   // Return Metrics Sheet
@@ -266,9 +303,9 @@ export const exportToExcel = (results: FinancialResults) => {
     ['RETURN METRICS ANALYSIS'],
     [''],
     ['Metric', 'Value', 'Benchmark', 'Status'],
-    ['Cap Rate', results.capRate / 100, 0.055, results.capRate >= 5.5 ? 'PASS' : 'FAIL'],
-    ['DSCR', results.dscr, 1.35, results.dscr >= 1.35 ? 'PASS' : results.dscr >= 1.20 ? 'MARGINAL' : 'FAIL'],
-    ['Debt Yield', results.debtYield / 100, 0.10, results.debtYield >= 10 ? 'PASS' : 'FAIL'],
+    ['Cap Rate', results.capRate / 100, 0.055, results.capRate >= 5.5 ? 'PASS' : 'NEEDS IMPROVEMENT'],
+    ['DSCR', results.dscr, 1.35, results.dscr >= 1.35 ? 'PASS' : results.dscr >= 1.20 ? 'MARGINAL' : 'REQUIRES ATTENTION'],
+    ['Debt Yield', results.debtYield / 100, 0.10, results.debtYield >= 10 ? 'PASS' : 'NEEDS IMPROVEMENT'],
     ['LTV', results.ltv / 100, 0.75, results.ltv <= 75 ? 'PASS' : 'MARGINAL'],
     [''],
     ['CASH FLOW ANALYSIS', ''],
@@ -277,9 +314,9 @@ export const exportToExcel = (results: FinancialResults) => {
     ['Cash Flow After Debt', results.cashFlowAfterDebt],
     [''],
     ['INVESTMENT SUMMARY', ''],
-    ['Total Development Cost', originalBudget.totalProjectCost],
+    ['Total Development Cost', CONFIG.project.totalDevelopmentCost],
     ['Max Supportable Debt', results.maxSupportableDebt],
-    ['Required Equity/Gap', results.fundingGap]
+    ['Required Additional Funding', results.fundingGap]
   ];
   const metricsWS = XLSX.utils.aoa_to_sheet(metricsData);
   XLSX.utils.book_append_sheet(wb, metricsWS, 'Return Metrics');

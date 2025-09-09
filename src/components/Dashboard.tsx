@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AlertTriangle, TrendingDown, TrendingUp, DollarSign, FileText, Download } from 'lucide-react';
+import { AlertTriangle, TrendingDown, TrendingUp, DollarSign, FileText, Download, Info } from 'lucide-react';
 import { 
   calculateFinancials, 
   scenarios, 
@@ -12,7 +12,7 @@ import {
   getCriticalIssues,
   getComplianceIssues
 } from '@/utils/calculations';
-// import type { FinancialResults } from '@/utils/calculations';
+import { CONFIG, totalUnits } from '@/data/config';
 
 // Components
 import MetricCard from './MetricCard';
@@ -31,7 +31,7 @@ const Dashboard: React.FC = () => {
   
   // Calculate results for current scenario
   const currentResults = calculateFinancials(scenarios[activeScenario]);
-  const fantasyResults = calculateFinancials(scenarios.fantasy);
+  const submittedResults = calculateFinancials(scenarios.submitted);
   
   // Get critical issues
   const criticalIssues = getCriticalIssues(currentResults);
@@ -67,20 +67,20 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Hero Banner */}
-      <div className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-8">
+      <div className="bg-gradient-to-r from-slate-900 to-slate-700 text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl font-bold mb-2">CHINA ALLEY VISTA</h1>
             <p className="text-xl mb-4">Financial Analysis by Zachary Vorsteg | September 10, 2025</p>
-            <div className={`inline-flex items-center px-4 py-2 rounded-lg font-semibold ${
+            <div className={`inline-flex items-center px-6 py-3 rounded-lg font-semibold text-sm ${
               currentResults.fundingGap > 2000000 || currentResults.dscr < 1.20 
-                ? 'bg-red-600' 
+                ? 'bg-red-600 hover:bg-red-700' 
                 : currentResults.fundingGap > 1500000 
-                  ? 'bg-yellow-600' 
-                  : 'bg-green-600'
-            }`}>
+                  ? 'bg-amber-600 hover:bg-amber-700' 
+                  : 'bg-green-600 hover:bg-green-700'
+            } transition-colors`}>
               {currentResults.fundingGap > 2000000 || currentResults.dscr < 1.20 
                 ? '⚠️ PROCEED WITH CONDITIONS' 
                 : '✅ FEASIBLE WITH LIHTC'}
@@ -92,34 +92,51 @@ const Dashboard: React.FC = () => {
       {/* Critical Alerts Bar */}
       <CriticalAlerts issues={[...criticalIssues, ...complianceIssues]} />
 
+      {/* Unit Count Indicator */}
+      <div className="bg-blue-50 border-b border-blue-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="flex items-center justify-center">
+            <Info className="h-4 w-4 mr-2 text-blue-600" />
+            <span className="text-sm font-medium text-blue-800">
+              Analysis Basis: {totalUnits} units ({CONFIG.DEFAULT_UNITS_MODE === 'BUILD_PLAN' ? 'Building Plan' : 'Exhibit E'})
+              {CONFIG.TOTAL_UNITS_BUILD_PLAN !== CONFIG.TOTAL_UNITS_EXHIBIT_E && (
+                <span className="ml-2 text-blue-600">
+                  • Reconciliation required: {CONFIG.TOTAL_UNITS_EXHIBIT_E} (Exhibit E) vs {CONFIG.TOTAL_UNITS_BUILD_PLAN} (Plans)
+                </span>
+              )}
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Key Metrics Cards */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <MetricCard
             title="Total Development Cost"
-            value={formatCurrency(6361829)}
-            subtitle="$198,807 per unit"
-            color="text-blue-600"
+            value={formatCurrency(CONFIG.project.totalDevelopmentCost)}
+            subtitle={`${formatCurrency(currentResults.costPerUnit)} per unit`}
+            color="text-slate-700"
             icon={<DollarSign className="h-6 w-6" />}
           />
           <MetricCard
             title="Funding Gap"
             value={formatCurrency(currentResults.fundingGap)}
-            subtitle={`vs ${formatCurrency(fantasyResults.fundingGap)} fantasy`}
+            subtitle={`vs ${formatCurrency(submittedResults.fundingGap)} as submitted`}
             color={getMetricColor('fundingGap', currentResults.fundingGap)}
             icon={<AlertTriangle className="h-6 w-6" />}
           />
           <MetricCard
             title="DSCR"
             value={formatRatio(currentResults.dscr)}
-            subtitle={`Min 1.20x required`}
+            subtitle={`Min ${formatRatio(CONFIG.debt.minDSCR)} required`}
             color={getMetricColor('dscr', currentResults.dscr)}
             icon={<TrendingUp className="h-6 w-6" />}
           />
           <MetricCard
             title="Return on Cost"
             value={formatPercentage(currentResults.returnOnCost)}
-            subtitle="Below 10% target"
+            subtitle="Industry target: 6-8%"
             color={getMetricColor('returnOnCost', currentResults.returnOnCost)}
             icon={<TrendingDown className="h-6 w-6" />}
           />
@@ -127,17 +144,17 @@ const Dashboard: React.FC = () => {
 
         {/* Scenario Toggle */}
         <div className="mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold mb-4">Analysis Scenario</h3>
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+            <h3 className="text-lg font-semibold mb-4 text-slate-900">Analysis Scenario</h3>
             <div className="flex flex-wrap gap-2">
               {Object.entries(scenarios).map(([key, scenario]) => (
                 <button
                   key={key}
                   onClick={() => setActiveScenario(key)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                     activeScenario === key
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? 'bg-slate-900 text-white shadow-lg'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200 hover:shadow-md'
                   }`}
                 >
                   {scenario.name}
@@ -151,14 +168,14 @@ const Dashboard: React.FC = () => {
         <div className="mb-8 flex justify-end gap-4">
           <button
             onClick={handleExportPDF}
-            className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            className="inline-flex items-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
           >
             <Download className="h-4 w-4 mr-2" />
             Export PDF Report
           </button>
           <button
             onClick={handleExportExcel}
-            className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
           >
             <Download className="h-4 w-4 mr-2" />
             Export Excel Model
@@ -166,7 +183,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Tabbed Interface */}
-        <div className="bg-white rounded-lg shadow">
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200">
           <TabNavigation 
             tabs={tabs}
             activeTab={activeTab}
