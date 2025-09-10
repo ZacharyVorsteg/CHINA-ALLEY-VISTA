@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "build:exports": "node generate-excel-standalone.js && node generate-pdf-report.js",
+    "test:models": "echo 'Testing financial models...' && node generate-excel-standalone.js"
   },
   "dependencies": {
     "@types/xlsx": "^0.0.35",
